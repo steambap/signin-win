@@ -17,9 +17,29 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body) (int, error) {
 		Layout:   VBox{},
 		MinSize:  Size{Width: 640, Height: 480},
 		Children: []Widget{
-			ListBox{
-				AssignTo: &listHandle.view,
-				Model:    listHandle.model,
+			TabWidget{
+				Pages: []TabPage{
+					{
+						Title: "志愿者列表",
+						Layout: VBox{},
+						Children: []Widget{
+							ListBox{
+								AssignTo: &listHandle.view,
+								Model:    listHandle.model,
+							},
+						},
+					},
+					{
+						Title: "日志预览",
+						Layout: VBox{},
+						Children: []Widget{
+							TextEdit{
+								Text: "placeholder",
+								ReadOnly: true,
+							},
+						},
+					},
+				},
 			},
 		},
 	}.Run(parent)

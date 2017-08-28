@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
+	"strconv"
 	"time"
 )
 
@@ -17,6 +19,22 @@ func init() {
 	for key, value := range bucketMap {
 		bucketSlice = append(bucketSlice, LocPair{key, value})
 	}
+	sort.Slice(bucketSlice, func(i, j int) bool {
+		var key1 = bucketSlice[i].key
+		var key2 = bucketSlice[j].key
+		var num1, err1 = strconv.ParseInt(key1, 10, 32)
+		var num2, err2 = strconv.ParseInt(key2, 10, 32)
+
+		if err1 != nil && err2 != nil {
+			return key1 < key2
+		} else if err1 != nil {
+			return false
+		} else if err2 != nil {
+			return true
+		} else {
+			return num1 < num2
+		}
+	})
 }
 
 func main() {
