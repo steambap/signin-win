@@ -50,3 +50,10 @@ type UrlConfig struct {
 func (urlConfig *UrlConfig) ToDailyUrl() string {
 	return "/log?date=" + urlConfig.Date.Format("2006-01-02") + "&loc=" + urlConfig.Loc
 }
+
+type Body struct {
+	Names   []string `json:"names" binding:"required"`
+	Tags    []string `json:"tags" binding:"required"`
+	Comment string   `json:"comment"`
+	CupSize int      `json:"cup_size"`
+}

@@ -4,9 +4,13 @@ import (
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 	"log"
-	"fmt"
 	"time"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
 )
+
+const apiOrigin = "http://localhost:8900"
 
 func init() {
 	for key, value := range bucketMap {
@@ -47,9 +51,15 @@ func main() {
 								Text: "导出日志",
 								OnClicked:func() {
 									if cmd, err := runDailyLogDialog(window, &urlConfig); err != nil {
-										walk.MsgBox(window, "错误", fmt.Sprintf("原因：%v", err), walk.MsgBoxIconError)
+										walk.MsgBox(window, "导出选项弹窗错误", err.Error(), walk.MsgBoxIconError)
 									} else if cmd == walk.DlgCmdOK {
-										walk.MsgBox(window, "!", fmt.Sprint(urlConfig), walk.MsgBoxOK)
+										logBody, err := getDailyLog(&urlConfig)
+										if err != nil {
+											walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
+										} else {
+											walk.MsgBox(window, "OK", "", walk.MsgBoxOK)
+											log.Print(logBody)
+										}
 									}
 								},
 							},
@@ -78,4 +88,28 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fail to Create Window:\n %v", err)
 	}
+}
+
+func getDailyLog(urlConfig *UrlConfig) (*Body, error) {
+	resp, err := http.Get(apiOrigin + urlConfig.ToDailyUrl())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var logBody = &Body{
+		Names:   make([]string, 0),
+		Tags:    make([]string, 0),
+		Comment: "",
+		CupSize: -1,
+	}
+	err = json.Unmarshal(resBody, logBody)
+	if err != nil {
+		return nil, err
+	}
+
+	return logBody, nil
 }
