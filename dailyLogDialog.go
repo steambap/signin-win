@@ -21,7 +21,7 @@ func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
 				Model:    listHandle.model,
 				OnCurrentIndexChanged: func() {
 					loc := listHandle.model.items[listHandle.view.CurrentIndex()]
-					data.Loc = loc.value
+					data.Loc = loc.key
 				},
 			},
 			Composite{

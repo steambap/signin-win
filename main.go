@@ -1,13 +1,14 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
-	"log"
-	"time"
-	"net/http"
 	"io/ioutil"
-	"encoding/json"
+	"log"
+	"net/http"
+	"time"
 )
 
 const apiOrigin = "http://localhost:8900"
@@ -49,7 +50,7 @@ func main() {
 						Children: []Widget{
 							PushButton{
 								Text: "导出日志",
-								OnClicked:func() {
+								OnClicked: func() {
 									if cmd, err := runDailyLogDialog(window, &urlConfig); err != nil {
 										walk.MsgBox(window, "导出选项弹窗错误", err.Error(), walk.MsgBoxIconError)
 									} else if cmd == walk.DlgCmdOK {
@@ -57,8 +58,9 @@ func main() {
 										if err != nil {
 											walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
 										} else {
-											walk.MsgBox(window, "OK", "", walk.MsgBoxOK)
-											log.Print(logBody)
+											if _, err2 := runExportDailyLogDialog(window, logBody); err2 != nil {
+												walk.MsgBox(window, "导出数据窗口错误", err.Error(), walk.MsgBoxIconError)
+											}
 										}
 									}
 								},
@@ -96,6 +98,9 @@ func getDailyLog(urlConfig *UrlConfig) (*Body, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
+	}
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err

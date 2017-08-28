@@ -25,7 +25,7 @@ func (model *ListAdapterModel) Value(index int) interface{} {
 }
 
 type LocListAdapter struct {
-	view *walk.ListBox
+	view  *walk.ListBox
 	model *LocListModel
 }
 
