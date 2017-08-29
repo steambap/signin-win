@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
+	//"log"
 )
 
 func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
@@ -14,32 +15,28 @@ func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
 		AssignTo: &dialog,
 		Title:    "获取日志",
 		MinSize:  Size{Width: 640, Height: 480},
-		Layout:   HBox{},
+		Layout:   VBox{},
 		Children: []Widget{
-			ListBox{
+			ComboBox{
 				AssignTo: &listHandle.view,
 				Model:    listHandle.model,
+				CurrentIndex: locIndexOf(bucketSlice, data.Loc),
 				OnCurrentIndexChanged: func() {
 					loc := listHandle.model.items[listHandle.view.CurrentIndex()]
 					data.Loc = loc.key
 				},
 			},
-			Composite{
-				Layout: VBox{},
-				Children: []Widget{
-					DateEdit{
-						Date:     data.Date,
-						AssignTo: &dateEdit,
-						OnDateChanged: func() {
-							data.Date = dateEdit.Date()
-						},
-					},
-					PushButton{
-						Text: "OK",
-						OnClicked: func() {
-							dialog.Accept()
-						},
-					},
+			DateEdit{
+				Date:     data.Date,
+				AssignTo: &dateEdit,
+				OnDateChanged: func() {
+					data.Date = dateEdit.Date()
+				},
+			},
+			PushButton{
+				Text: "OK",
+				OnClicked: func() {
+					dialog.Accept()
 				},
 			},
 		},

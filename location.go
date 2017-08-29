@@ -60,3 +60,12 @@ type LocPair struct {
 }
 
 var bucketSlice = make([]LocPair, 0, len(bucketMap))
+
+func locIndexOf(arr []LocPair, key string) int {
+	for index, loc := range arr {
+		if loc.key == key {
+			return index
+		}
+	}
+	return 0
+}
