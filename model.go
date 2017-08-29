@@ -66,3 +66,10 @@ func (log *Body) getCupSizeText() string {
 func (log *Body) getCountText() string {
 	return "人数" + strconv.FormatInt(int64(len(log.Names)), 10)
 }
+
+func (log *Body) getExportLineArr() []string {
+	var cupSizeText = log.getCupSizeText()
+	var countText = log.getCountText()
+
+	return append([]string{cupSizeText, countText}, log.Names...)
+}

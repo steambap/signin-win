@@ -6,6 +6,8 @@ import (
 	"log"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
+	"github.com/xuri/excelize"
 )
 
 func runExportDailyLogDialog(parent walk.Form, logBody *Body) (int, error) {
@@ -37,7 +39,7 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body) (int, error) {
 									fDialog := walk.FileDialog{Filter: ".txt"}
 									ok, err := fDialog.ShowSave(dialog)
 									if err != nil {
-										log.Print(err)
+										walk.MsgBox(dialog, "导出txt弹窗错误", err.Error(), walk.MsgBoxIconError)
 									} else if ok {
 										saveDailyLogText(fDialog.FilePath, logBody)
 									}
@@ -45,7 +47,15 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body) (int, error) {
 							},
 							PushButton{
 								Text: "导出Excel格式",
-								Enabled: false,
+								OnClicked:func() {
+									fDialog := walk.FileDialog{Filter: ".xlsx"}
+									ok, err := fDialog.ShowSave(dialog)
+									if err != nil {
+										walk.MsgBox(dialog, "导出Excel弹窗错误", err.Error(), walk.MsgBoxIconError)
+									} else if ok {
+										saveDailyLogExcel(fDialog.FilePath, logBody)
+									}
+								},
 							},
 						},
 					},
@@ -73,5 +83,19 @@ func saveDailyLogText(fsPath string, log *Body) error {
 	if filepath.Ext(fsPath) != ".txt" {
 		fsPath = fsPath + ".txt"
 	}
-	return ioutil.WriteFile(fsPath, []byte(log.getCupSizeText()), 0644)
+	return ioutil.WriteFile(fsPath, []byte(strings.Join(log.getExportLineArr(), "\r\n")), 0644)
+}
+
+func saveDailyLogExcel(fsPath string, log *Body) error {
+	if filepath.Ext(fsPath) != ".xlsx" {
+		fsPath = fsPath + ".xlsx"
+	}
+
+	xlsx := excelize.NewFile()
+	lines := log.getExportLineArr()
+	for i, line := range lines {
+		xlsx
+	}
+
+	return xlsx.SaveAs(fsPath)
 }
