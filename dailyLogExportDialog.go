@@ -3,14 +3,15 @@ package main
 import (
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
-	"log"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"github.com/xuri/excelize"
+	"fmt"
+	"time"
 )
 
-func runExportDailyLogDialog(parent walk.Form, logBody *Body) (int, error) {
+func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int, error) {
 	var dialog *walk.Dialog
 	listHandle := &BaseListAdapter{model: &ListAdapterModel{items: logBody.Names}}
 
@@ -64,12 +65,14 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body) (int, error) {
 						Layout: VBox{},
 						Children: []Widget{
 							TextEdit{
-								Text: "placeholder",
+								Text: logBody.getPreview(t),
 								ReadOnly: true,
 							},
 							PushButton{
 								Text: "复制内容",
-								Enabled: false,
+								OnClicked:func() {
+									walk.Clipboard().SetText(logBody.getPreview(t))
+								},
 							},
 						},
 					},
@@ -94,7 +97,7 @@ func saveDailyLogExcel(fsPath string, log *Body) error {
 	xlsx := excelize.NewFile()
 	lines := log.getExportLineArr()
 	for i, line := range lines {
-		xlsx
+		xlsx.SetCellStr("Sheet1", fmt.Sprintf("A%v", i + 1), line)
 	}
 
 	return xlsx.SaveAs(fsPath)

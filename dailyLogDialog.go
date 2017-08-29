@@ -34,7 +34,7 @@ func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
 				},
 			},
 			PushButton{
-				Text: "OK",
+				Text: "确认",
 				OnClicked: func() {
 					dialog.Accept()
 				},

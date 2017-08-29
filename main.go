@@ -44,8 +44,9 @@ func main() {
 	_, err := MainWindow{
 		Title:    "心栈签到",
 		AssignTo: &window,
-		MinSize:  Size{Width: 800, Height: 600},
+		MinSize:  Size{Width: 480, Height: 240},
 		Layout:   VBox{},
+		Font: Font{PointSize: 16},
 		MenuItems: []MenuItem{
 			Menu{
 				Text: "文件",
@@ -76,7 +77,7 @@ func main() {
 										if err != nil {
 											walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
 										} else {
-											if _, err2 := runExportDailyLogDialog(window, logBody); err2 != nil {
+											if _, err2 := runExportDailyLogDialog(window, logBody, urlConfig.Date); err2 != nil {
 												walk.MsgBox(window, "导出数据窗口错误", err.Error(), walk.MsgBoxIconError)
 											}
 										}
