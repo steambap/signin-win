@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/lxn/walk"
 	"time"
+	"strconv"
 )
 
 type BaseListAdapter struct {
@@ -56,4 +57,12 @@ type Body struct {
 	Tags    []string `json:"tags" binding:"required"`
 	Comment string   `json:"comment"`
 	CupSize int      `json:"cup_size"`
+}
+
+func (log *Body) getCupSizeText() string {
+	return "杯数" + strconv.FormatInt(int64(log.CupSize), 10)
+}
+
+func (log *Body) getCountText() string {
+	return "人数" + strconv.FormatInt(int64(len(log.Names)), 10)
 }
