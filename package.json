@@ -1,0 +1,18 @@
+{
+  "name": "signin-win",
+  "version": "1.0.0",
+  "description": "signin PC",
+  "private": true,
+  "main": "main.go",
+  "repository": "https://github.com/steambap/signin-win.git",
+  "author": "Weilin Shi <934587911@qq.com>",
+  "scripts": {
+    "build": "go build -ldflags=\"-linkmode internal -X main.apiOrigin=http://xinzhanqiandao.xuedot.com -s -w -H windowsgui\"",
+    "zip": "powershell compress-archive -LiteralPath signin-win.exe, signin-win.exe.manifest -DestinationPath \"心栈签到.zip\" -Force",
+    "start": "yarn run build && yarn run zip"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "rcedit": "^0.9.0"
+  }
+}

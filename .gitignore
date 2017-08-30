@@ -14,3 +14,5 @@
 .glide/
 
 .idea/workspace.xml
+*.log
+node_modules

@@ -13,11 +13,15 @@ import (
 	"time"
 )
 
-const apiOrigin = "http://localhost:8900"
+var apiOrigin string
 
 var MY_FONT = Font{PointSize: 14, Family: "微软雅黑"}
 
 func init() {
+	// dev api setting
+	if apiOrigin == "" {
+		apiOrigin = "http://localhost:8900"
+	}
 	for key, value := range bucketMap {
 		bucketSlice = append(bucketSlice, LocPair{key, value})
 	}
