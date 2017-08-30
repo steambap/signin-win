@@ -1,13 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
+	"github.com/xuri/excelize"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
-	"github.com/xuri/excelize"
-	"fmt"
 	"time"
 )
 
@@ -19,24 +19,25 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int,
 		AssignTo: &dialog,
 		Title:    "导出数据预览",
 		Layout:   VBox{},
-		MinSize:  Size{Width: 360, Height: 480},
+		MinSize:  Size{Width: 480, Height: 640},
+		Font:     MY_FONT,
 		Children: []Widget{
 			TabWidget{
 				Pages: []TabPage{
 					{
-						Title: "志愿者列表",
+						Title:  "志愿者列表",
 						Layout: Grid{Columns: 2},
 						Children: []Widget{
 							Label{Text: logBody.getCupSizeText()},
 							Label{Text: logBody.getCountText()},
 							ListBox{
-								AssignTo: &listHandle.view,
-								Model:    listHandle.model,
+								AssignTo:   &listHandle.view,
+								Model:      listHandle.model,
 								ColumnSpan: 2,
 							},
 							PushButton{
 								Text: "导出txt格式",
-								OnClicked:func() {
+								OnClicked: func() {
 									fDialog := walk.FileDialog{Filter: ".txt"}
 									ok, err := fDialog.ShowSave(dialog)
 									if err != nil {
@@ -48,7 +49,7 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int,
 							},
 							PushButton{
 								Text: "导出Excel格式",
-								OnClicked:func() {
+								OnClicked: func() {
 									fDialog := walk.FileDialog{Filter: ".xlsx"}
 									ok, err := fDialog.ShowSave(dialog)
 									if err != nil {
@@ -61,16 +62,17 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int,
 						},
 					},
 					{
-						Title: "日志预览",
+						Title:  "日志预览",
 						Layout: VBox{},
 						Children: []Widget{
 							TextEdit{
-								Text: logBody.getPreview(t),
+								Text:     logBody.getPreview(t),
 								ReadOnly: true,
+								VScroll:  true,
 							},
 							PushButton{
 								Text: "复制内容",
-								OnClicked:func() {
+								OnClicked: func() {
 									walk.Clipboard().SetText(logBody.getPreview(t))
 								},
 							},
@@ -97,7 +99,7 @@ func saveDailyLogExcel(fsPath string, log *Body) error {
 	xlsx := excelize.NewFile()
 	lines := log.getExportLineArr()
 	for i, line := range lines {
-		xlsx.SetCellStr("Sheet1", fmt.Sprintf("A%v", i + 1), line)
+		xlsx.SetCellStr("Sheet1", fmt.Sprintf("A%v", i+1), line)
 	}
 
 	return xlsx.SaveAs(fsPath)

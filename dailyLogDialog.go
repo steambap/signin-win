@@ -14,12 +14,13 @@ func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
 	return Dialog{
 		AssignTo: &dialog,
 		Title:    "获取日志",
-		MinSize:  Size{Width: 640, Height: 480},
+		MinSize:  Size{Width: 540, Height: 360},
 		Layout:   VBox{},
+		Font:     MY_FONT,
 		Children: []Widget{
 			ComboBox{
-				AssignTo: &listHandle.view,
-				Model:    listHandle.model,
+				AssignTo:     &listHandle.view,
+				Model:        listHandle.model,
 				CurrentIndex: locIndexOf(bucketSlice, data.Loc),
 				OnCurrentIndexChanged: func() {
 					loc := listHandle.model.items[listHandle.view.CurrentIndex()]

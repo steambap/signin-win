@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/lxn/walk"
-	"time"
-	"strconv"
 	"fmt"
+	"github.com/lxn/walk"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type BaseListAdapter struct {
@@ -115,7 +115,7 @@ func (log *Body) remixTagTable() map[string]string {
 		for _, tag := range tagList {
 			names, exist := tagToName[tag]
 			if exist {
-				tagToName[tag] = names  + "、" + name
+				tagToName[tag] = names + "、" + name
 			} else {
 				tagToName[tag] = name
 			}

@@ -15,6 +15,8 @@ import (
 
 const apiOrigin = "http://localhost:8900"
 
+var MY_FONT = Font{PointSize: 14, Family: "微软雅黑"}
+
 func init() {
 	for key, value := range bucketMap {
 		bucketSlice = append(bucketSlice, LocPair{key, value})
@@ -44,9 +46,9 @@ func main() {
 	_, err := MainWindow{
 		Title:    "心栈签到",
 		AssignTo: &window,
-		MinSize:  Size{Width: 480, Height: 240},
+		MinSize:  Size{Width: 540, Height: 240},
 		Layout:   VBox{},
-		Font: Font{PointSize: 16},
+		Font:     MY_FONT,
 		MenuItems: []MenuItem{
 			Menu{
 				Text: "文件",
