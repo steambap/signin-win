@@ -8,14 +8,14 @@ import (
 func runOverviewDialog(parent walk.Form) (int, error) {
 	var dialog *walk.Dialog
 	var treeView *walk.TreeView
-
+	treeModel := newLocTreeModel()
 
 	return Dialog{
-		AssignTo:&dialog,
-		Title:"数据总览",
-		MinSize:Size{Width:640, Height:480},
-		Font:MY_FONT,
-		Layout:VBox{},
+		AssignTo: &dialog,
+		Title:    "数据总览",
+		MinSize:  Size{Width: 640, Height: 640},
+		Font:     MY_FONT,
+		Layout:   VBox{},
 		Children: []Widget{
 			Composite{
 				Layout: HBox{MarginsZero: true},
@@ -24,6 +24,7 @@ func runOverviewDialog(parent walk.Form) (int, error) {
 						Children: []Widget{
 							TreeView{
 								AssignTo: &treeView,
+								Model:    treeModel,
 							},
 							Label{Text: "fixme"},
 						},

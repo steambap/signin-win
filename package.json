@@ -9,7 +9,8 @@
   "scripts": {
     "build": "go build -ldflags=\"-linkmode internal -X main.apiOrigin=http://xinzhanqiandao.xuedot.com -s -w -H windowsgui\"",
     "zip": "powershell compress-archive -LiteralPath signin-win.exe, signin-win.exe.manifest -DestinationPath \"心栈签到.zip\" -Force",
-    "start": "yarn run build && yarn run zip"
+    "start": "yarn run build && yarn run zip",
+    "start32": "powershell $env:GOARCH=\"386\" && yarn start"
   },
   "license": "MIT",
   "dependencies": {

@@ -42,7 +42,8 @@ func (model *LocListModel) ItemCount() int {
 }
 
 func (model *LocListModel) Value(index int) interface{} {
-	return model.items[index].value
+	loc := model.items[index]
+	return "NO." + loc.key + " " + loc.value
 }
 
 // Location tree model implementation
@@ -53,15 +54,38 @@ type RootLocation struct {
 }
 
 func (tree *RootLocation) Text() string {
-	return tree.value
+	return "NO." + tree.key + " " + tree.value
 }
 
 func (*RootLocation) Parent() walk.TreeItem {
 	return nil
 }
 
+var fakeArr = [...]string{"4", "6", "8"}
+
 func (tree *RootLocation) ChildCount() int {
-	// FIXME lazy population
+	// FIXME run HTTP request to do lazy population
+	if tree.children == nil {
+		children := make([]*MonthItem, 0, len(fakeArr))
+		for _, num := range fakeArr {
+			monthItem := &MonthItem{
+				name:     "2017-0" + num,
+				parent:   tree,
+				children: make([]*DayItem, 0, len(fakeArr)),
+			}
+			for idx := range fakeArr {
+				dayItem := &DayItem{
+					name:   "2017-0" + num + "-0" + strconv.FormatInt(int64(idx), 10),
+					parent: monthItem,
+				}
+				monthItem.children = append(monthItem.children, dayItem)
+			}
+
+			children = append(children, monthItem)
+		}
+
+		tree.children = children
+	}
 
 	return len(tree.children)
 }
@@ -71,8 +95,8 @@ func (tree *RootLocation) ChildAt(index int) walk.TreeItem {
 }
 
 type MonthItem struct {
-	name string
-	parent *RootLocation
+	name     string
+	parent   *RootLocation
 	children []*DayItem
 }
 
@@ -93,7 +117,7 @@ func (tree *MonthItem) ChildAt(index int) walk.TreeItem {
 }
 
 type DayItem struct {
-	name string
+	name   string
 	parent *MonthItem
 }
 
@@ -116,6 +140,15 @@ func (*DayItem) ChildAt(index int) walk.TreeItem {
 type LocTreeModel struct {
 	walk.TreeModelBase
 	roots []*RootLocation
+}
+
+func newLocTreeModel() *LocTreeModel {
+	roots := make([]*RootLocation, 0, len(bucketSlice))
+	for _, loc := range bucketSlice {
+		roots = append(roots, &RootLocation{LocPair: loc})
+	}
+
+	return &LocTreeModel{roots: roots}
 }
 
 func (*LocTreeModel) LazyPopulation() bool {
