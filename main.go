@@ -68,46 +68,44 @@ func main() {
 		},
 		Children: []Widget{
 			Composite{
-				Layout: VBox{},
+				Layout: Grid{Columns: 3},
 				Children: []Widget{
-					Composite{
-						Layout: HBox{},
-						Children: []Widget{
-							PushButton{
-								Text: "导出日志",
-								OnClicked: func() {
-									if cmd, err := runDailyLogDialog(window, &urlConfig); err != nil {
-										walk.MsgBox(window, "导出选项弹窗错误", err.Error(), walk.MsgBoxIconError)
-									} else if cmd == walk.DlgCmdOK {
-										logBody, err := getDailyLog(&urlConfig)
-										if err != nil {
-											walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
-										} else {
-											if _, err2 := runExportDailyLogDialog(window, logBody, urlConfig.Date); err2 != nil {
-												walk.MsgBox(window, "导出数据窗口错误", err.Error(), walk.MsgBoxIconError)
-											}
-										}
+					PushButton{
+						Text: "导出日志",
+						OnClicked: func() {
+							if cmd, err := runDailyLogDialog(window, &urlConfig); err != nil {
+								walk.MsgBox(window, "导出选项弹窗错误", err.Error(), walk.MsgBoxIconError)
+							} else if cmd == walk.DlgCmdOK {
+								logBody, err := getDailyLog(&urlConfig)
+								if err != nil {
+									walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
+								} else {
+									if _, err2 := runExportDailyLogDialog(window, logBody, urlConfig.Date); err2 != nil {
+										walk.MsgBox(window, "导出数据窗口错误", err.Error(), walk.MsgBoxIconError)
 									}
-								},
-							},
-							PushButton{
-								Text:    "导出周数据",
-								Enabled: false,
-							},
-							PushButton{
-								Text:    "导出年数据",
-								Enabled: false,
-							},
+								}
+							}
 						},
 					},
 					PushButton{
-						Text:    "查看/编辑全部数据",
+						Text:    "导出周数据",
 						Enabled: false,
 					},
+					PushButton{
+						Text:    "导出年数据",
+						Enabled: false,
+					},
+					PushButton{
+						Text:    "查看/编辑全部数据",
+						ColumnSpan: 3,
+						Enabled: false,
+						OnClicked: func() {
+							if _, err := runOverviewDialog(window); err != nil {
+								walk.MsgBox(window, "查看全部数据弹窗错误", err.Error(), walk.MsgBoxIconError)
+							}
+						},
+					},
 				},
-			},
-			Label{
-				Text: "数据预览区域",
 			},
 		},
 	}.Run()

@@ -73,7 +73,9 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int,
 							PushButton{
 								Text: "复制内容",
 								OnClicked: func() {
-									walk.Clipboard().SetText(logBody.getPreview(t))
+									clipBoard := walk.Clipboard()
+									clipBoard.Clear()
+									clipBoard.SetText(logBody.getPreview(t))
 								},
 							},
 						},

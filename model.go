@@ -45,6 +45,93 @@ func (model *LocListModel) Value(index int) interface{} {
 	return model.items[index].value
 }
 
+// Location tree model implementation
+// Tree Item interface
+type RootLocation struct {
+	LocPair
+	children []*MonthItem
+}
+
+func (tree *RootLocation) Text() string {
+	return tree.value
+}
+
+func (*RootLocation) Parent() walk.TreeItem {
+	return nil
+}
+
+func (tree *RootLocation) ChildCount() int {
+	// FIXME lazy population
+
+	return len(tree.children)
+}
+
+func (tree *RootLocation) ChildAt(index int) walk.TreeItem {
+	return tree.children[index]
+}
+
+type MonthItem struct {
+	name string
+	parent *RootLocation
+	children []*DayItem
+}
+
+func (tree *MonthItem) Text() string {
+	return tree.name
+}
+
+func (tree *MonthItem) Parent() walk.TreeItem {
+	return tree.parent
+}
+
+func (tree *MonthItem) ChildCount() int {
+	return len(tree.children)
+}
+
+func (tree *MonthItem) ChildAt(index int) walk.TreeItem {
+	return tree.children[index]
+}
+
+type DayItem struct {
+	name string
+	parent *MonthItem
+}
+
+func (tree *DayItem) Text() string {
+	return tree.name
+}
+
+func (tree *DayItem) Parent() walk.TreeItem {
+	return tree.parent
+}
+
+func (*DayItem) ChildCount() int {
+	return 0
+}
+
+func (*DayItem) ChildAt(index int) walk.TreeItem {
+	return nil
+}
+
+type LocTreeModel struct {
+	walk.TreeModelBase
+	roots []*RootLocation
+}
+
+func (*LocTreeModel) LazyPopulation() bool {
+	// we do not want to scan the whole database at start
+	return true
+}
+
+func (tree *LocTreeModel) RootCount() int {
+	return len(tree.roots)
+}
+
+func (tree *LocTreeModel) RootAt(index int) walk.TreeItem {
+	return tree.roots[index]
+}
+
+// export time and location
 type UrlConfig struct {
 	Loc  string
 	Date time.Time

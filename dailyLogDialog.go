@@ -18,6 +18,7 @@ func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
 		Layout:   VBox{},
 		Font:     MY_FONT,
 		Children: []Widget{
+			Label{Text: "第一步：选择一个心栈"},
 			ComboBox{
 				AssignTo:     &listHandle.view,
 				Model:        listHandle.model,
@@ -27,6 +28,7 @@ func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
 					data.Loc = loc.key
 				},
 			},
+			Label{Text: "第二步：选择一个日期"},
 			DateEdit{
 				Date:     data.Date,
 				AssignTo: &dateEdit,
