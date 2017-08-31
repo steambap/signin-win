@@ -42,8 +42,7 @@ func (model *LocListModel) ItemCount() int {
 }
 
 func (model *LocListModel) Value(index int) interface{} {
-	loc := model.items[index]
-	return "NO." + loc.key + " " + loc.value
+	return model.items[index].ToString()
 }
 
 // Location tree model implementation

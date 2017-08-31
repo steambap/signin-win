@@ -59,6 +59,10 @@ type LocPair struct {
 	key, value string
 }
 
+func (loc *LocPair) ToString() string {
+	return "NO." + loc.key + " " + loc.value
+}
+
 var bucketSlice = make([]LocPair, 0, len(bucketMap))
 
 func locIndexOf(arr []LocPair, key string) int {

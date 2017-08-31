@@ -50,7 +50,7 @@ func main() {
 	_, err := MainWindow{
 		Title:    "心栈签到",
 		AssignTo: &window,
-		MinSize:  Size{Width: 540, Height: 240},
+		MinSize:  Size{Width: 540, Height: 320},
 		Layout:   VBox{},
 		Font:     MY_FONT,
 		MenuItems: []MenuItem{
@@ -102,6 +102,14 @@ func main() {
 							if _, err := runOverviewDialog(window); err != nil {
 								walk.MsgBox(window, "查看全部数据弹窗错误", err.Error(), walk.MsgBoxIconError)
 							}
+						},
+					},
+					GroupBox{
+						Title: "信息",
+						ColumnSpan: 3,
+						Layout: HBox{},
+						Children: []Widget{
+							Label{Text: "版本："},
 						},
 					},
 				},

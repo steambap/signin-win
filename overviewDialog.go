@@ -13,7 +13,7 @@ func runOverviewDialog(parent walk.Form) (int, error) {
 	return Dialog{
 		AssignTo: &dialog,
 		Title:    "数据总览",
-		MinSize:  Size{Width: 640, Height: 640},
+		MinSize:  Size{Width: 800, Height: 640},
 		Font:     MY_FONT,
 		Layout:   VBox{},
 		Children: []Widget{
@@ -22,6 +22,9 @@ func runOverviewDialog(parent walk.Form) (int, error) {
 				Children: []Widget{
 					HSplitter{
 						Children: []Widget{
+							ListBox{
+
+							},
 							TreeView{
 								AssignTo: &treeView,
 								Model:    treeModel,
