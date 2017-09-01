@@ -3,17 +3,17 @@ package main
 import (
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
-	//"log"
 )
 
-func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
+func getUrlConfigDialog(parent walk.Form, reqType RequestType) (int, error) {
 	var dialog *walk.Dialog
 	var dateEdit *walk.DateEdit
 	listHandle := &LocListAdapter{model: &LocListModel{items: bucketSlice}}
+	var label *walk.Label
 
 	return Dialog{
 		AssignTo: &dialog,
-		Title:    "获取日志",
+		Title:    "获取数据",
 		MinSize:  Size{Width: 540, Height: 360},
 		Layout:   VBox{},
 		Font:     MY_FONT,
@@ -22,19 +22,25 @@ func runDailyLogDialog(parent walk.Form, data *UrlConfig) (int, error) {
 			ComboBox{
 				AssignTo:     &listHandle.view,
 				Model:        listHandle.model,
-				CurrentIndex: locIndexOf(bucketSlice, data.Loc),
+				CurrentIndex: locIndexOf(bucketSlice, urlConfig.Loc),
 				OnCurrentIndexChanged: func() {
 					loc := listHandle.model.items[listHandle.view.CurrentIndex()]
-					data.Loc = loc.key
+					urlConfig.Loc = loc.key
+					label.SetText(urlConfig.Explain(reqType))
 				},
 			},
 			Label{Text: "第二步：选择一个日期"},
 			DateEdit{
-				Date:     data.Date,
+				Date:     urlConfig.Date,
 				AssignTo: &dateEdit,
 				OnDateChanged: func() {
-					data.Date = dateEdit.Date()
+					urlConfig.Date = dateEdit.Date()
+					label.SetText(urlConfig.Explain(reqType))
 				},
+			},
+			Label{
+				Text: urlConfig.Explain(reqType),
+				AssignTo: &label,
 			},
 			PushButton{
 				Text: "确认",

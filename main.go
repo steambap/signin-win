@@ -19,11 +19,14 @@ var apiOrigin string
 
 var MY_FONT = Font{PointSize: 14, Family: "微软雅黑"}
 
+var urlConfig UrlConfig
+
 func init() {
 	// dev api setting
 	if apiOrigin == "" {
 		apiOrigin = "http://localhost:8900"
 	}
+	urlConfig = UrlConfig{Loc: "0", Date: time.Now()}
 	for key, value := range bucketMap {
 		bucketSlice = append(bucketSlice, LocPair{key, value})
 	}
@@ -47,7 +50,6 @@ func init() {
 
 func main() {
 	var window *walk.MainWindow
-	urlConfig := UrlConfig{Loc: "0", Date: time.Now()}
 
 	_, err := MainWindow{
 		Title:    "心栈签到",
@@ -75,7 +77,7 @@ func main() {
 					PushButton{
 						Text: "导出日志",
 						OnClicked: func() {
-							if cmd, err := runDailyLogDialog(window, &urlConfig); err != nil {
+							if cmd, err := getUrlConfigDialog(window, RequestDailyLog); err != nil {
 								walk.MsgBox(window, "导出选项弹窗错误", err.Error(), walk.MsgBoxIconError)
 							} else if cmd == walk.DlgCmdOK {
 								logBody, err := getDailyLog(&urlConfig)
@@ -94,24 +96,32 @@ func main() {
 						Enabled: false,
 					},
 					PushButton{
-						Text:    "导出年数据",
+						Text:    "年统计信息",
 						Enabled: false,
 					},
 					PushButton{
 						Text:       "查看/编辑全部数据",
 						ColumnSpan: 3,
+						Enabled: false,
 						OnClicked: func() {
 							if _, err := runOverviewDialog(window); err != nil {
 								walk.MsgBox(window, "查看全部数据弹窗错误", err.Error(), walk.MsgBoxIconError)
 							}
 						},
 					},
-					GroupBox{
-						Title: "信息",
+					Composite{
 						ColumnSpan: 3,
-						Layout: HBox{},
+						Layout: VBox{MarginsZero: true},
 						Children: []Widget{
-							Label{Text: "版本："},
+							GroupBox{
+								Title: "手机签到：",
+								Layout: HBox{},
+								Children: []Widget{
+									Label{
+										Text: apiOrigin,
+									},
+								},
+							},
 						},
 					},
 				},

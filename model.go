@@ -243,3 +243,19 @@ func (log *Body) remixTagTable() map[string]string {
 
 	return tagToName
 }
+
+type RequestType int
+const (
+	RequestDailyLog RequestType = iota
+	//RequestWeekData
+	//RequestYearData
+)
+
+func (urlConfig *UrlConfig) Explain(reqType RequestType) string {
+	switch reqType {
+	case RequestDailyLog:
+		return fmt.Sprintf("获取 %v 心栈 %v 的数据", bucketMap[urlConfig.Loc], urlConfig.Date.Format("2006-01-02"))
+	}
+
+	return ""
+}
