@@ -39,7 +39,7 @@ func getUrlConfigDialog(parent walk.Form, reqType RequestType) (int, error) {
 				},
 			},
 			Label{
-				Text: urlConfig.Explain(reqType),
+				Text:     urlConfig.Explain(reqType),
 				AssignTo: &label,
 			},
 			PushButton{

@@ -22,9 +22,7 @@ func runOverviewDialog(parent walk.Form) (int, error) {
 				Children: []Widget{
 					HSplitter{
 						Children: []Widget{
-							ListBox{
-
-							},
+							ListBox{},
 							TreeView{
 								AssignTo: &treeView,
 								Model:    treeModel,

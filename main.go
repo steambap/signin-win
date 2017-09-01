@@ -5,6 +5,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 	"io/ioutil"
@@ -96,13 +97,34 @@ func main() {
 						Enabled: false,
 					},
 					PushButton{
-						Text:    "年统计信息",
-						Enabled: false,
+						Text: "年统计信息",
+						OnClicked: func() {
+							if cmd, err := getUrlConfigDialog(window, RequestYearData); err != nil {
+								walk.MsgBox(window, "导出选项弹窗错误", err.Error(), walk.MsgBoxIconError)
+							} else if cmd == walk.DlgCmdOK {
+								yearStats, err := getYearStats(&urlConfig)
+								if err != nil {
+									walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
+								} else {
+									walk.MsgBox(
+										window,
+										"年统计信息",
+										fmt.Sprintf(
+											"杯数：%v\r\n人数：%v\r\n人次：%v\r\n新人：%v",
+											yearStats.CupSize,
+											yearStats.NumOfTime,
+											yearStats.NumOfPeople,
+											yearStats.NumOfNew,
+										),
+										walk.MsgBoxOK)
+								}
+							}
+						},
 					},
 					PushButton{
 						Text:       "查看/编辑全部数据",
 						ColumnSpan: 3,
-						Enabled: false,
+						Enabled:    false,
 						OnClicked: func() {
 							if _, err := runOverviewDialog(window); err != nil {
 								walk.MsgBox(window, "查看全部数据弹窗错误", err.Error(), walk.MsgBoxIconError)
@@ -111,10 +133,10 @@ func main() {
 					},
 					Composite{
 						ColumnSpan: 3,
-						Layout: VBox{MarginsZero: true},
+						Layout:     VBox{MarginsZero: true},
 						Children: []Widget{
 							GroupBox{
-								Title: "手机签到：",
+								Title:  "手机签到：",
 								Layout: HBox{},
 								Children: []Widget{
 									Label{
@@ -154,9 +176,24 @@ func getDailyLog(urlConfig *UrlConfig) (*Body, error) {
 		CupSize: -1,
 	}
 	err = json.Unmarshal(resBody, logBody)
+
+	return logBody, err
+}
+
+func getYearStats(urlConfig *UrlConfig) (*YearStats, error) {
+	resp, err := http.Get(apiOrigin + urlConfig.ToYearStatsUrl())
 	if err != nil {
 		return nil, err
 	}
-
-	return logBody, nil
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
+	}
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var yearStats = &YearStats{}
+	err = json.Unmarshal(resBody, yearStats)
+	return yearStats, err
 }

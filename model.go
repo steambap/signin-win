@@ -163,16 +163,6 @@ func (tree *LocTreeModel) RootAt(index int) walk.TreeItem {
 	return tree.roots[index]
 }
 
-// export time and location
-type UrlConfig struct {
-	Loc  string
-	Date time.Time
-}
-
-func (urlConfig *UrlConfig) ToDailyUrl() string {
-	return "/log?date=" + urlConfig.Date.Format("2006-01-02") + "&loc=" + urlConfig.Loc
-}
-
 type Body struct {
 	Names   []string `json:"names" binding:"required"`
 	Tags    []string `json:"tags" binding:"required"`
@@ -244,18 +234,42 @@ func (log *Body) remixTagTable() map[string]string {
 	return tagToName
 }
 
+// export time and location
+type UrlConfig struct {
+	Loc  string
+	Date time.Time
+}
+
+func (urlConfig *UrlConfig) ToDailyUrl() string {
+	return "/log?date=" + urlConfig.Date.Format("2006-01-02") + "&loc=" + urlConfig.Loc
+}
+
+func (urlConfig *UrlConfig) ToYearStatsUrl() string {
+	return "/loc/" + urlConfig.Loc + "/year/" + strconv.FormatInt(int64(urlConfig.Date.Year()), 10)
+}
+
 type RequestType int
+
 const (
 	RequestDailyLog RequestType = iota
 	//RequestWeekData
-	//RequestYearData
+	RequestYearData
 )
 
 func (urlConfig *UrlConfig) Explain(reqType RequestType) string {
 	switch reqType {
 	case RequestDailyLog:
 		return fmt.Sprintf("获取 %v 心栈 %v 的数据", bucketMap[urlConfig.Loc], urlConfig.Date.Format("2006-01-02"))
+	case RequestYearData:
+		return fmt.Sprintf("获取 %v 心栈 %v 年的数据", bucketMap[urlConfig.Loc], urlConfig.Date.Year())
 	}
 
 	return ""
+}
+
+type YearStats struct {
+	CupSize     int `json:"cupSize"`
+	NumOfTime   int `json:"numOfTime"`
+	NumOfPeople int `json:"numOfPeople"`
+	NumOfNew    int `json:"numOfNew"`
 }
