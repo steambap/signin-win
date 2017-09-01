@@ -1,3 +1,5 @@
+//go:generate goversioninfo -icon=renai.ico -manifest=signin-win.exe.manifest
+
 package main
 
 import (
