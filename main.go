@@ -22,12 +22,24 @@ var MY_FONT = Font{PointSize: 14, Family: "微软雅黑"}
 
 var urlConfig UrlConfig
 
+var setting *walk.IniFileSettings
+
 func init() {
 	// dev api setting
 	if apiOrigin == "" {
 		apiOrigin = "http://localhost:8900"
 	}
-	urlConfig = UrlConfig{Loc: "0", Date: time.Now()}
+	initLoc := "0"
+	setting = walk.NewIniFileSettings("settings.ini")
+	if err := setting.Load(); err != nil {
+		fmt.Print(err)
+	} else {
+		savedLoc, ok := setting.Get("loc")
+		if ok {
+			initLoc = savedLoc
+		}
+	}
+	urlConfig = UrlConfig{Loc: initLoc, Date: time.Now()}
 	for key, value := range bucketMap {
 		bucketSlice = append(bucketSlice, LocPair{key, value})
 	}
@@ -63,7 +75,7 @@ func main() {
 		MinSize:  Size{Width: 540, Height: 320},
 		Layout:   VBox{},
 		Font:     MY_FONT,
-		Icon: icon,
+		Icon:     icon,
 		MenuItems: []MenuItem{
 			Menu{
 				Text: "文件",
@@ -172,6 +184,13 @@ func main() {
 
 	if err != nil {
 		log.Fatalf("Fail to Create Window:\n %v", err)
+	}
+
+	err = setting.Put("loc", urlConfig.Loc)
+	if err == nil {
+		setting.Save()
+	} else {
+		fmt.Print(err)
 	}
 }
 
