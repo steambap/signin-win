@@ -244,6 +244,10 @@ func (urlConfig *UrlConfig) ToDailyUrl() string {
 	return "/log?date=" + urlConfig.Date.Format("2006-01-02") + "&loc=" + urlConfig.Loc
 }
 
+func (urlConfig *UrlConfig) ToWeekDataUrl() string {
+	return "/loc/" + urlConfig.Loc + "/week/" + urlConfig.Date.Format("2006-01-02")
+}
+
 func (urlConfig *UrlConfig) ToYearStatsUrl() string {
 	return "/loc/" + urlConfig.Loc + "/year/" + strconv.FormatInt(int64(urlConfig.Date.Year()), 10)
 }
@@ -252,7 +256,7 @@ type RequestType int
 
 const (
 	RequestDailyLog RequestType = iota
-	//RequestWeekData
+	RequestWeekData
 	RequestYearData
 )
 
@@ -260,6 +264,8 @@ func (urlConfig *UrlConfig) Explain(reqType RequestType) string {
 	switch reqType {
 	case RequestDailyLog:
 		return fmt.Sprintf("获取 %v 心栈 %v 的数据", bucketMap[urlConfig.Loc], urlConfig.Date.Format("2006-01-02"))
+	case RequestWeekData:
+		return fmt.Sprintf("获取 %v 心栈 %v 那一周的数据", bucketMap[urlConfig.Loc], urlConfig.Date.Format("2006-01-02"))
 	case RequestYearData:
 		return fmt.Sprintf("获取 %v 心栈 %v 年的数据", bucketMap[urlConfig.Loc], urlConfig.Date.Year())
 	}
@@ -272,4 +278,36 @@ type YearStats struct {
 	NumOfTime   int `json:"numOfTime"`
 	NumOfPeople int `json:"numOfPeople"`
 	NumOfNew    int `json:"numOfNew"`
+}
+
+type WeekStats struct {
+	YearStats
+	Names []string
+}
+
+func calcWeekData(logList []Body) *WeekStats {
+	nameMap := map[string]bool{}
+	weekStats := &WeekStats{
+		YearStats{0, 0, 0, 0},
+		nil,
+	}
+	for _, log := range logList {
+		weekStats.CupSize += log.CupSize
+		weekStats.NumOfTime += len(log.Names)
+		for _, tags := range log.Tags {
+			if strings.Contains(tags, "新人") {
+				weekStats.NumOfNew += 1
+			}
+		}
+		for _, name := range log.Names {
+			nameMap[name] = true
+		}
+	}
+	weekStats.NumOfPeople = len(nameMap)
+	weekStats.Names = make([]string, 0, len(nameMap))
+	for name := range nameMap {
+		weekStats.Names = append(weekStats.Names, name)
+	}
+
+	return weekStats
 }

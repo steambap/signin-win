@@ -93,8 +93,21 @@ func main() {
 						},
 					},
 					PushButton{
-						Text:    "导出周数据",
-						Enabled: false,
+						Text: "导出周数据",
+						OnClicked: func() {
+							if cmd, err := getUrlConfigDialog(window, RequestWeekData); err != nil {
+								walk.MsgBox(window, "导出选项弹窗错误", err.Error(), walk.MsgBoxIconError)
+							} else if cmd == walk.DlgCmdOK {
+								logList, err := getWeekData(&urlConfig)
+								if err != nil {
+									walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
+								} else {
+									if _, err2 := runExportWeekDataDialog(window, logList, urlConfig.Date); err2 != nil {
+										walk.MsgBox(window, "导出数据窗口错误", err.Error(), walk.MsgBoxIconError)
+									}
+								}
+							}
+						},
 					},
 					PushButton{
 						Text: "年统计信息",
@@ -178,6 +191,25 @@ func getDailyLog(urlConfig *UrlConfig) (*Body, error) {
 	err = json.Unmarshal(resBody, logBody)
 
 	return logBody, err
+}
+
+func getWeekData(urlConfig *UrlConfig) ([]Body, error) {
+	resp, err := http.Get(apiOrigin + urlConfig.ToWeekDataUrl())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
+	}
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var logList = make([]Body, 0, 7)
+	err = json.Unmarshal(resBody, &logList)
+
+	return logList, err
 }
 
 func getYearStats(urlConfig *UrlConfig) (*YearStats, error) {
