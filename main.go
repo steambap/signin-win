@@ -51,13 +51,19 @@ func init() {
 
 func main() {
 	var window *walk.MainWindow
+	icon, err := walk.NewIconFromResourceId(6)
+	if err != nil {
+		log.Print(err)
+		icon = nil
+	}
 
-	_, err := MainWindow{
+	_, err = MainWindow{
 		Title:    "心栈签到",
 		AssignTo: &window,
 		MinSize:  Size{Width: 540, Height: 320},
 		Layout:   VBox{},
 		Font:     MY_FONT,
+		Icon: icon,
 		MenuItems: []MenuItem{
 			Menu{
 				Text: "文件",
