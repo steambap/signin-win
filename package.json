@@ -13,8 +13,5 @@
     "start": "yarn run build && yarn run zip",
     "start32": "yarn run build && yarn run zip32"
   },
-  "license": "MIT",
-  "dependencies": {
-    "rcedit": "^0.9.0"
-  }
+  "license": "MIT"
 }
