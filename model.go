@@ -8,6 +8,25 @@ import (
 	"time"
 )
 
+type LocPair struct {
+	key, value string
+}
+
+func (loc *LocPair) ToString() string {
+	return "NO." + loc.key + " " + loc.value
+}
+
+var bucketSlice = make([]LocPair, 0, len(bucketMap))
+
+func locIndexOf(arr []LocPair, key string) int {
+	for index, loc := range arr {
+		if loc.key == key {
+			return index
+		}
+	}
+	return 0
+}
+
 type BaseListAdapter struct {
 	view  *walk.ListBox
 	model *ListAdapterModel
@@ -274,22 +293,22 @@ func (urlConfig *UrlConfig) Explain(reqType RequestType) string {
 }
 
 type YearStats struct {
-	CupSize     int `json:"cupSize"`
-	NumOfTime   int `json:"numOfTime"`
-	NumOfPeople int `json:"numOfPeople"`
-	NumOfNew    int `json:"numOfNew"`
+	CupSize   int      `json:"cupSize"`
+	NumOfTime int      `json:"numOfTime"`
+	NumOfNew  int      `json:"numOfNew"`
+	Names     []string `json:"names"`
 }
 
 type WeekStats struct {
 	YearStats
-	Names []string
+	NumOfPeople int `json:"numOfPeople"`
 }
 
 func calcWeekData(logList []Body) *WeekStats {
 	nameMap := map[string]bool{}
 	weekStats := &WeekStats{
-		YearStats{0, 0, 0, 0},
-		nil,
+		YearStats{0, 0, 0, nil},
+		0,
 	}
 	for _, log := range logList {
 		weekStats.CupSize += log.CupSize

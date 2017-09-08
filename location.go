@@ -54,22 +54,3 @@ var bucketMap = map[string]string{
 	"X2": "天津大港环保",
 	"X3": "天津滨海环保",
 }
-
-type LocPair struct {
-	key, value string
-}
-
-func (loc *LocPair) ToString() string {
-	return "NO." + loc.key + " " + loc.value
-}
-
-var bucketSlice = make([]LocPair, 0, len(bucketMap))
-
-func locIndexOf(arr []LocPair, key string) int {
-	for index, loc := range arr {
-		if loc.key == key {
-			return index
-		}
-	}
-	return 0
-}

@@ -144,7 +144,7 @@ func main() {
 											"杯数：%v\r\n人数：%v\r\n人次：%v\r\n新人：%v",
 											yearStats.CupSize,
 											yearStats.NumOfTime,
-											yearStats.NumOfPeople,
+											len(yearStats.Names),
 											yearStats.NumOfNew,
 										),
 										walk.MsgBoxOK)
