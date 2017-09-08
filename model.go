@@ -46,7 +46,12 @@ func (model *ListAdapterModel) Value(index int) interface{} {
 	return model.items[index]
 }
 
-type LocListAdapter struct {
+type LocListBoxAdapter struct {
+	view  *walk.ListBox
+	model *LocListModel
+}
+
+type LocComboBoxAdapter struct {
 	view  *walk.ComboBox
 	model *LocListModel
 }

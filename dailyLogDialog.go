@@ -8,7 +8,7 @@ import (
 func getUrlConfigDialog(parent walk.Form, reqType RequestType) (int, error) {
 	var dialog *walk.Dialog
 	var dateEdit *walk.DateEdit
-	listHandle := &LocListAdapter{model: &LocListModel{items: bucketSlice}}
+	listHandle := &LocComboBoxAdapter{model: &LocListModel{items: bucketSlice}}
 	var label *walk.Label
 
 	return Dialog{

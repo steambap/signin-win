@@ -162,7 +162,6 @@ func main() {
 					PushButton{
 						Text:       "查看/编辑全部数据",
 						ColumnSpan: 3,
-						Enabled:    false,
 						OnClicked: func() {
 							if _, err := runOverviewDialog(window); err != nil {
 								walk.MsgBox(window, "查看全部数据弹窗错误", err.Error(), walk.MsgBoxIconError)
