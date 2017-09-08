@@ -81,6 +81,13 @@ func main() {
 				Text: "文件",
 				Items: []MenuItem{
 					Action{
+						Text: "关于",
+						OnTriggered: func() {
+							walk.MsgBox(window, "你居然点了", "©2017 - present Weilin Shi\r\n本软件最终解释权属于北京龙泉寺", walk.MsgBoxOK)
+						},
+					},
+					Separator{},
+					Action{
 						Text: "退出",
 						OnTriggered: func() {
 							window.Close()
