@@ -71,60 +71,36 @@ func (model *LocListModel) Value(index int) interface{} {
 
 // Location tree model implementation
 // Tree Item interface
-type RootLocation struct {
-	LocPair
+type YearItem struct {
+	year     int
 	children []*MonthItem
 }
 
-func (tree *RootLocation) Text() string {
-	return "NO." + tree.key + " " + tree.value
+func (tree *YearItem) Text() string {
+	return strconv.FormatInt(int64(tree.year), 10) + "年"
 }
 
-func (*RootLocation) Parent() walk.TreeItem {
+func (*YearItem) Parent() walk.TreeItem {
 	return nil
 }
 
-var fakeArr = [...]string{"4", "6", "8"}
-
-func (tree *RootLocation) ChildCount() int {
-	// FIXME run HTTP request to do lazy population
-	if tree.children == nil {
-		children := make([]*MonthItem, 0, len(fakeArr))
-		for _, num := range fakeArr {
-			monthItem := &MonthItem{
-				name:     "2017-0" + num,
-				parent:   tree,
-				children: make([]*DayItem, 0, len(fakeArr)),
-			}
-			for idx := range fakeArr {
-				dayItem := &DayItem{
-					name:   "2017-0" + num + "-0" + strconv.FormatInt(int64(idx), 10),
-					parent: monthItem,
-				}
-				monthItem.children = append(monthItem.children, dayItem)
-			}
-
-			children = append(children, monthItem)
-		}
-
-		tree.children = children
-	}
-
+func (tree *YearItem) ChildCount() int {
 	return len(tree.children)
 }
 
-func (tree *RootLocation) ChildAt(index int) walk.TreeItem {
+func (tree *YearItem) ChildAt(index int) walk.TreeItem {
 	return tree.children[index]
 }
 
 type MonthItem struct {
-	name     string
-	parent   *RootLocation
+	year     int
+	month    int
+	parent   *YearItem
 	children []*DayItem
 }
 
 func (tree *MonthItem) Text() string {
-	return tree.name
+	return fmt.Sprintf("%v年%v月", tree.year, tree.month)
 }
 
 func (tree *MonthItem) Parent() walk.TreeItem {
@@ -140,12 +116,12 @@ func (tree *MonthItem) ChildAt(index int) walk.TreeItem {
 }
 
 type DayItem struct {
-	name   string
+	t      time.Time
 	parent *MonthItem
 }
 
 func (tree *DayItem) Text() string {
-	return tree.name
+	return tree.t.Format("2006-01-02")
 }
 
 func (tree *DayItem) Parent() walk.TreeItem {
@@ -162,21 +138,74 @@ func (*DayItem) ChildAt(index int) walk.TreeItem {
 
 type LocTreeModel struct {
 	walk.TreeModelBase
-	roots []*RootLocation
+	roots []*YearItem
 }
 
-func newLocTreeModel() *LocTreeModel {
-	roots := make([]*RootLocation, 0, len(bucketSlice))
-	for _, loc := range bucketSlice {
-		roots = append(roots, &RootLocation{LocPair: loc})
+func newEmptyTreeModel() *LocTreeModel {
+	roots := make([]*YearItem, 0)
+
+	return &LocTreeModel{roots: roots}
+}
+
+func addToRoot(roots []*YearItem, t time.Time) []*YearItem {
+	year := t.Year()
+	month := int(t.Month())
+
+	var yearItem *YearItem
+	for _, yearChild := range roots {
+		if yearChild.year == year {
+			yearItem = yearChild
+			break
+		}
+	}
+	if yearItem == nil {
+		yearItem = &YearItem{year, make([]*MonthItem, 0)}
+		roots = append(roots, yearItem)
+	}
+
+	var monthItem *MonthItem
+	for _, monthChild := range yearItem.children {
+		if monthChild.month == month {
+			monthItem = monthChild
+			break
+		}
+	}
+	if monthItem == nil {
+		monthItem = &MonthItem{year, month, yearItem, make([]*DayItem, 0)}
+		yearItem.children = append(yearItem.children, monthItem)
+	}
+
+	dayItem := &DayItem{t, monthItem}
+	monthItem.children = append(monthItem.children, dayItem)
+
+	return roots
+}
+
+func treeModelFromList(keys []string) *LocTreeModel {
+	timeList := make([]time.Time, 0, len(keys))
+	for _, key := range keys {
+		t, err := time.Parse("2006-01-02", key)
+		if err != nil {
+			continue
+		} else {
+			timeList = append(timeList, t)
+		}
+	}
+
+	if len(timeList) == 0 {
+		return newEmptyTreeModel()
+	}
+
+	roots := make([]*YearItem, 0)
+	for _, t := range timeList {
+		roots = addToRoot(roots, t)
 	}
 
 	return &LocTreeModel{roots: roots}
 }
 
 func (*LocTreeModel) LazyPopulation() bool {
-	// we do not want to scan the whole database at start
-	return true
+	return false
 }
 
 func (tree *LocTreeModel) RootCount() int {
@@ -256,6 +285,24 @@ func (log *Body) remixTagTable() map[string]string {
 	}
 
 	return tagToName
+}
+
+func (*Body) formatTags(tag string) string {
+	if tag == "" {
+		return tag
+	}
+
+	return "（" + strings.Replace(tag, "|", "、", -1) + "）"
+}
+
+func (log *Body) getNamesWithTags() []string {
+	nameList := make([]string, 0, len(log.Names))
+
+	for index, name := range log.Names {
+		nameList = append(nameList, name + log.formatTags(log.Tags[index]))
+	}
+
+	return nameList
 }
 
 // export time and location

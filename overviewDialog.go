@@ -6,20 +6,23 @@ import (
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"strings"
 )
 
 func runOverviewDialog(parent walk.Form) (int, error) {
 	var dialog *walk.Dialog
 	listHandle := &LocListBoxAdapter{model: &LocListModel{items: bucketSlice}}
 	var treeView *walk.TreeView
-	treeModel := newLocTreeModel()
+	treeModel := newEmptyTreeModel()
+
+	var numInput *walk.NumberEdit
+	var txtInput *walk.TextEdit
 
 	return Dialog{
 		AssignTo: &dialog,
 		Title:    "数据总览",
-		MinSize:  Size{Width: 1000, Height: 600},
+		MinSize:  Size{Width: 1024, Height: 768},
 		Font:     MY_FONT,
 		Layout:   VBox{},
 		Children: []Widget{
@@ -31,21 +34,74 @@ func runOverviewDialog(parent walk.Form) (int, error) {
 							ListBox{
 								AssignTo: &listHandle.view,
 								Model:    listHandle.model,
+								MaxSize:  Size{Width: 200, Height: 600},
 								OnCurrentIndexChanged: func() {
 									locPair := listHandle.model.items[listHandle.view.CurrentIndex()]
 									keys, err := scanBucket(locPair.key)
 									if err != nil {
 										walk.MsgBox(dialog, "获取远程数据失败", err.Error(), walk.MsgBoxOK)
 									} else {
-										log.Print(keys)
+										treeView.SetModel(treeModelFromList(keys))
 									}
 								},
 							},
 							TreeView{
 								AssignTo: &treeView,
 								Model:    treeModel,
+								MaxSize:  Size{Width: 200, Height: 600},
+								OnCurrentItemChanged: func() {
+									sel := treeView.CurrentItem()
+									switch sel.(type) {
+									case *DayItem:
+										date := sel.(*DayItem).t
+										loc := listHandle.model.items[listHandle.view.CurrentIndex()].key
+										dailyLog, err := getDailyLog(&UrlConfig{loc, date})
+										if err != nil {
+											walk.MsgBox(dialog, "获取日志错误", err.Error(), walk.MsgBoxOK)
+										} else {
+											numInput.SetValue(float64(dailyLog.CupSize))
+											namesWithTags := dailyLog.getNamesWithTags()
+											txtInput.SetText(strings.Join(namesWithTags, "\r\n"))
+										}
+									}
+								},
 							},
-							Label{Text: "fixme"},
+							Composite{
+								Layout: Grid{Columns: 3},
+								Children: []Widget{
+									Label{
+										Text:       "杯数",
+										ColumnSpan: 1,
+										RowSpan:    1,
+									},
+									NumberEdit{
+										AssignTo: &numInput,
+										Value:      0.0,
+										ColumnSpan: 2,
+										RowSpan:    1,
+									},
+									TextEdit{
+										AssignTo: &txtInput,
+										ColumnSpan: 3,
+										RowSpan:    1,
+									},
+									//PushButton{
+									//	Text:       "添加",
+									//	ColumnSpan: 1,
+									//	RowSpan:    1,
+									//},
+									//PushButton{
+									//	Text:       "编辑",
+									//	ColumnSpan: 1,
+									//	RowSpan:    1,
+									//},
+									//PushButton{
+									//	Text:       "删除",
+									//	ColumnSpan: 1,
+									//	RowSpan:    1,
+									//},
+								},
+							},
 						},
 					},
 				},

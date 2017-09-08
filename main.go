@@ -160,7 +160,7 @@ func main() {
 						},
 					},
 					PushButton{
-						Text:       "查看/编辑全部数据",
+						Text:       "查看全部数据",
 						ColumnSpan: 3,
 						OnClicked: func() {
 							if _, err := runOverviewDialog(window); err != nil {
