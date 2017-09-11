@@ -110,7 +110,7 @@ func main() {
 								if err != nil {
 									walk.MsgBox(window, "获取远程数据错误", err.Error(), walk.MsgBoxIconError)
 								} else {
-									if _, err2 := runExportDailyLogDialog(window, logBody, urlConfig.Date); err2 != nil {
+									if _, err2 := runExportDailyLogDialog(window, logBody, &urlConfig); err2 != nil {
 										walk.MsgBox(window, "导出数据窗口错误", err.Error(), walk.MsgBoxIconError)
 									}
 								}

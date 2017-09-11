@@ -8,10 +8,9 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
-func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int, error) {
+func runExportDailyLogDialog(parent walk.Form, logBody *Body, urlConfig *UrlConfig) (int, error) {
 	var dialog *walk.Dialog
 	listHandle := &BaseListAdapter{model: &ListAdapterModel{items: logBody.Names}}
 
@@ -20,6 +19,7 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int,
 		Title:    "导出数据预览",
 		Layout:   VBox{},
 		MinSize:  Size{Width: 480, Height: 640},
+		Size:     Size{Width: 600, Height: 720},
 		Font:     MY_FONT,
 		Children: []Widget{
 			TabWidget{
@@ -66,7 +66,7 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int,
 						Layout: VBox{},
 						Children: []Widget{
 							TextEdit{
-								Text:     logBody.getPreview(t),
+								Text:     logBody.getPreview(urlConfig),
 								ReadOnly: true,
 								VScroll:  true,
 							},
@@ -75,7 +75,7 @@ func runExportDailyLogDialog(parent walk.Form, logBody *Body, t time.Time) (int,
 								OnClicked: func() {
 									clipBoard := walk.Clipboard()
 									clipBoard.Clear()
-									clipBoard.SetText(logBody.getPreview(t))
+									clipBoard.SetText(logBody.getPreview(urlConfig))
 								},
 							},
 						},

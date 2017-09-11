@@ -75,15 +75,17 @@ func runOverviewDialog(parent walk.Form) (int, error) {
 										RowSpan:    1,
 									},
 									NumberEdit{
-										AssignTo: &numInput,
+										AssignTo:   &numInput,
 										Value:      0.0,
 										ColumnSpan: 2,
 										RowSpan:    1,
+										ReadOnly:   true,
 									},
 									TextEdit{
-										AssignTo: &txtInput,
+										AssignTo:   &txtInput,
 										ColumnSpan: 3,
 										RowSpan:    1,
+										ReadOnly:   true,
 									},
 									//PushButton{
 									//	Text:       "添加",

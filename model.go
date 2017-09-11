@@ -238,48 +238,74 @@ func (log *Body) getExportLineArr() []string {
 	return append([]string{cupSizeText, countText}, log.Names...)
 }
 
-func (log *Body) getPreview(t time.Time) string {
+func weekToCN(w time.Weekday) string {
+	switch w {
+	case time.Monday:
+		return "周一"
+	case time.Tuesday:
+		return "周二"
+	case time.Wednesday:
+		return "周三"
+	case time.Thursday:
+		return "周四"
+	case time.Friday:
+		return "周五"
+	case time.Saturday:
+		return "周六"
+	default:
+		return "周日"
+	}
+}
+
+func (log *Body) getPreview(urlConfig *UrlConfig) string {
+	t := urlConfig.Date
+	loc := bucketMap[urlConfig.Loc]
 	tagToName := log.remixTagTable()
-	ret := fmt.Sprintf("奉粥日期：%v年%v月%v日（%v）\r\n", t.Year(), int(t.Month()), t.Day(), t.Weekday().String())
-	ret += fmt.Sprintf("日负责人：%v\r\n", tagToName["负责人"])
-	ret += fmt.Sprintf("签到：%v\r\n", tagToName["签到"])
-	ret += fmt.Sprintf("熬粥：%v\r\n", tagToName["熬粥"])
-	ret += fmt.Sprintf("前行：%v\r\n", tagToName["前行"])
-	ret += fmt.Sprintf("杯数：%v\r\n", log.CupSize)
-	ret += fmt.Sprintf("人数：%v\r\n", len(log.Names))
-	ret += fmt.Sprintf("新人：%v\r\n", tagToName["新人"])
-	ret += fmt.Sprintf("摄影：%v\r\n", tagToName["摄影"])
+	ret := fmt.Sprintf("标题：仁爱 %v心栈 %v年%v月%v日奉粥日志+题目\r\n", loc, t.Year(), int(t.Month()), t.Day())
+	ret += fmt.Sprintf("奉粥日期：%v年%v月%v日（%v）\r\n", t.Year(), int(t.Month()), t.Day(), weekToCN(t.Weekday()))
+	ret += fmt.Sprintf("日负责人：%v\r\n", strings.Join(tagToName["负责人"], "、"))
+	ret += fmt.Sprintf("签到：%v\r\n", strings.Join(tagToName["签到"], "、"))
+	ret += fmt.Sprintf("熬粥：%v\r\n", strings.Join(tagToName["熬粥"], "、"))
+	ret += fmt.Sprintf("前行：%v\r\n", strings.Join(tagToName["前行"], "、"))
+	ret += fmt.Sprintf("杯数：%v 杯\r\n", log.CupSize)
+	ret += fmt.Sprintf("人数：%v 人\r\n", len(log.Names))
+	ret += fmt.Sprintf("新人数：%v 人，%v\r\n", len(tagToName["新人"]), strings.Join(tagToName["新人"], "、"))
+	ret += fmt.Sprintf("摄影：%v\r\n", strings.Join(tagToName["摄影"], "、"))
 	ret += fmt.Sprintf("日志：无\r\n")
 	ret += fmt.Sprintf("文宣：\r\n")
-	ret += fmt.Sprintf("结行：%v\r\n", tagToName["结行"])
-	ret += fmt.Sprintf("后勤：%v\r\n", tagToName["后勤"])
-	ret += fmt.Sprintf("环保：%v\r\n", tagToName["环保"])
-	ret += fmt.Sprintf("奉粥：%v\r\n", tagToName["奉粥"])
+	ret += fmt.Sprintf("结行：%v\r\n", strings.Join(tagToName["结行"], "、"))
+	ret += fmt.Sprintf("后勤：%v\r\n", strings.Join(tagToName["后勤"], "、"))
+	ret += fmt.Sprintf("环保：%v\r\n", strings.Join(tagToName["环保"], "、"))
+	ret += fmt.Sprintf("奉粥：%v\r\n", strings.Join(tagToName["奉粥"], "、"))
 
 	return ret
 }
 
-func (log *Body) remixTagTable() map[string]string {
-	tagToName := make(map[string]string, 10)
+func (log *Body) remixTagTable() map[string][]string {
+	tagToName := map[string][]string{
+		"负责人": {},
+		"签到":  {},
+		"熬粥":  {},
+		"前行":  {},
+		"环保":  {},
+		"摄影":  {},
+		"新人":  {},
+		"结行":  {},
+		"后勤":  {},
+		"奉粥":  {},
+	}
 	for index, tags := range log.Tags {
 		name := log.Names[index]
 		// 所有没有参加环保的都是奉粥人员
 		ok := strings.Contains(tags, "环保")
 		if !ok {
-			names, exist := tagToName["奉粥"]
-			if exist {
-				tagToName["奉粥"] = names + "、" + name
-			} else {
-				tagToName["奉粥"] = name
-			}
+			tagToName["奉粥"] = append(tagToName["奉粥"], name)
 		}
 		tagList := strings.Split(tags, "|")
 		for _, tag := range tagList {
-			names, exist := tagToName[tag]
+			nameList, exist := tagToName[tag]
 			if exist {
-				tagToName[tag] = names + "、" + name
-			} else {
-				tagToName[tag] = name
+				tagToName[tag] = append(nameList, name)
 			}
 		}
 	}
@@ -299,7 +325,7 @@ func (log *Body) getNamesWithTags() []string {
 	nameList := make([]string, 0, len(log.Names))
 
 	for index, name := range log.Names {
-		nameList = append(nameList, name + log.formatTags(log.Tags[index]))
+		nameList = append(nameList, name+log.formatTags(log.Tags[index]))
 	}
 
 	return nameList
