@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"github.com/lxn/walk"
-	. "github.com/lxn/walk/declarative"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/lxn/walk"
+	. "github.com/lxn/walk/declarative"
 )
 
 func runOverviewDialog(parent walk.Form) (int, error) {
@@ -87,21 +88,6 @@ func runOverviewDialog(parent walk.Form) (int, error) {
 										RowSpan:    1,
 										ReadOnly:   true,
 									},
-									//PushButton{
-									//	Text:       "添加",
-									//	ColumnSpan: 1,
-									//	RowSpan:    1,
-									//},
-									//PushButton{
-									//	Text:       "编辑",
-									//	ColumnSpan: 1,
-									//	RowSpan:    1,
-									//},
-									//PushButton{
-									//	Text:       "删除",
-									//	ColumnSpan: 1,
-									//	RowSpan:    1,
-									//},
 								},
 							},
 						},

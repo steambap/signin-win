@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/lxn/walk"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/lxn/walk"
 )
 
 type LocPair struct {
@@ -261,7 +262,7 @@ func (log *Body) getPreview(urlConfig *UrlConfig) string {
 	t := urlConfig.Date
 	loc := bucketMap[urlConfig.Loc]
 	tagToName := log.remixTagTable()
-	ret := fmt.Sprintf("标题：仁爱 %v心栈 %v年%v月%v日奉粥日志+题目\r\n", loc, t.Year(), int(t.Month()), t.Day())
+	ret := fmt.Sprintf("标题：仁爱 %v心栈 %v年%v月%v日奉粥日志\r\n", loc, t.Year(), int(t.Month()), t.Day())
 	ret += fmt.Sprintf("奉粥日期：%v年%v月%v日（%v）\r\n", t.Year(), int(t.Month()), t.Day(), weekToCN(t.Weekday()))
 	ret += fmt.Sprintf("日负责人：%v\r\n", strings.Join(tagToName["负责人"], "、"))
 	ret += fmt.Sprintf("签到：%v\r\n", strings.Join(tagToName["签到"], "、"))
@@ -271,8 +272,8 @@ func (log *Body) getPreview(urlConfig *UrlConfig) string {
 	ret += fmt.Sprintf("人数：%v 人\r\n", len(log.Names))
 	ret += fmt.Sprintf("新人数：%v 人，%v\r\n", len(tagToName["新人"]), strings.Join(tagToName["新人"], "、"))
 	ret += fmt.Sprintf("摄影：%v\r\n", strings.Join(tagToName["摄影"], "、"))
-	ret += fmt.Sprintf("日志：无\r\n")
-	ret += fmt.Sprintf("文宣：\r\n")
+	ret += fmt.Sprintf("日志：%v\r\n", strings.Join(tagToName["日志"], "、"))
+	ret += fmt.Sprintf("文宣：%v\r\n", strings.Join(tagToName["文宣"], "、"))
 	ret += fmt.Sprintf("结行：%v\r\n", strings.Join(tagToName["结行"], "、"))
 	ret += fmt.Sprintf("后勤：%v\r\n", strings.Join(tagToName["后勤"], "、"))
 	ret += fmt.Sprintf("环保：%v\r\n", strings.Join(tagToName["环保"], "、"))
@@ -293,6 +294,8 @@ func (log *Body) remixTagTable() map[string][]string {
 		"结行":  {},
 		"后勤":  {},
 		"奉粥":  {},
+		"日志":  {},
+		"文宣":  {},
 	}
 	for index, tags := range log.Tags {
 		name := log.Names[index]
