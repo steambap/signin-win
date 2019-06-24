@@ -2,13 +2,13 @@
 	"FixedFileInfo": {
 		"FileVersion": {
 			"Major": 2,
-			"Minor": 3,
+			"Minor": 5,
 			"Patch": 0,
 			"Build": 0
 		},
 		"ProductVersion": {
 			"Major": 2,
-			"Minor": 3,
+			"Minor": 5,
 			"Patch": 0,
 			"Build": 0
 		},
@@ -22,14 +22,14 @@
 		"Comments": "",
 		"CompanyName": "org.weilinshi",
 		"FileDescription": "仁爱心栈电子签到系统",
-		"FileVersion": "v2.3.0",
+		"FileVersion": "v2.5.0",
 		"InternalName": "signin",
 		"LegalCopyright": "©2017 - present Weilin Shi",
 		"LegalTrademarks": "石威林",
 		"OriginalFilename": "signin.exe",
 		"PrivateBuild": "",
 		"ProductName": "Sign in",
-		"ProductVersion": "v2.3.0.0",
+		"ProductVersion": "v2.5.0.0",
 		"SpecialBuild": ""
 	}
 }

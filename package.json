@@ -7,7 +7,7 @@
   "repository": "https://github.com/steambap/signin-win.git",
   "author": "Weilin Shi <934587911@qq.com>",
   "scripts": {
-    "build": "go build -ldflags=\"-linkmode internal -X main.apiOrigin=http://121.42.167.194 -s -w -H windowsgui\"",
+    "build": "GOOS=windows GOARCH=386 go build -ldflags=\"-linkmode internal -X main.apiOrigin=http://121.42.167.194 -s -w -H windowsgui\"",
     "zip": "powershell compress-archive -LiteralPath signin-win.exe -DestinationPath \"心栈签到64位.zip\" -Force",
     "zip32": "powershell compress-archive -LiteralPath signin-win.exe -DestinationPath \"心栈签到32位.zip\" -Force",
     "start": "yarn run build && yarn run zip",
